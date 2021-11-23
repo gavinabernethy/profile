@@ -1,0 +1,42 @@
+
+/**************************** TAG SELECTORS ****************************/
+
+body {
+  background-color: #F4F3F3;
+  max-width: 80%;
+  margin: auto;
+  font-family: "Verdana";
+}
+
+h1 {
+  text-align: center;
+  color: #494949;
+  font-family: "Geneva";
+}
+
+h3 {
+  text-align: center;
+  color: #494949;
+  font-family: "Geneva";
+}
+
+h4 {
+  color: #494949;
+  font-family: "Geneva";
+}
+
+hr {
+  border: none;
+  border-top: 8px double #494949;
+  width: 40%;
+  height: 0;
+  margin-top: 80px;
+  margin-bottom: 80px;
+}
+
+/**************************** CLASS SELECTORS ****************************/
+
+.center {
+  margin-left: auto;
+  margin-right: auto;
+}
