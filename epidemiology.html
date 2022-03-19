@@ -1,11 +1,263 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>Epidemiology</title>
-    <link rel="stylesheet" href="css/styles.css">
-  </head>
-  <body>
 
-  </body>
+<head>
+  <meta charset="utf-8">
+  <title>Epidemiology and COVID-19 in Northern Ireland</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="images/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400&family=Lora&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <h1>Epidemiological modelling and COVID-19 in the UK</h1>
+  <p>A summary of this work was presented as an online <a href="images/Research/Epidemiology/epidemics8_poster_abernethy.pdf">poster</a>
+  at the 8th International Conference on Infectious Disease Dynamics,
+  and it has been published in the <em>Journal of the Royal Society Interface</em>.</p>
+  <h3>Prior investigations</h3>
+  <p>The original approach when the pandemic began was to
+    adapt the patch-based spatial modelling paradigm from our previous work in ecological modelling.
+    To do this, we split Great Britain into Scotland, Wales, and the seven NHS regions of England,
+    and further subdivided the populations of each into two categories - regular and "vulnerable", which
+    was approximated by the fraction of the local population aged over 60.
+    <br><br>
+    Once the relative population density of each region was accounted for, we were able
+     to obtain broadly reasonable overall predictions for deaths in each region.
+     However, it turned out that this was being achieved mainly by assuming extremely high degrees
+     of spread in the less-vulnerable population, which is clearly not what was happening in reality.
+     Fixing this was likely to require fitting our outputs by this age- or vulnerability-class.
+     Furthermore, it was very far from obvious how we should model the relative rates of infection within
+     a region, between adjacent regions, or between non-adjacent regions. Given the means of travel available
+     in the modern world, it might be more sensible to look at probabilistic functions used in colonisation-extinction
+     patch dynamic models in landscape ecology, rather than a coupled ODE model (which might be more
+      suitable at certain scales for historic contexts).
+    <br><br>
+    As a result, and following numerous conversations both internally and with partners at Ulster University
+    (where, at the time there seemed to be a possibility of developing circuit breaker lockdown recommendations
+    for the Department of Health and the executive - there was a meeting in late 2020 to discuss possible collaborations
+    but nothing came of it), I decided to essentially restart development on this project with a different focus in mind:
+    <ul>
+      <li>Focus on Northern Ireland, as this is likely underserved in terms of bespoke modelling from larger research groups.</li>
+      <li>Remove the spatial network element.</li>
+      <li>Upgrade the two-class population model to a more regimented age-structured model with five 20-year age classes.</li>
+      <li>Using hospital admissions, rather than less reliable mortality data, as the output to fit the simulation.</li>
+    </ul>
+  </p>
+
+
+<h3>Age-structured model for Northern Ireland</h3>
+
+<table cellspacing="80" class="center" width=85%>
+<td class="profile-td">
+    <img src="images/Research/Epidemiology/model_flowchart.png" alt="covid" width="500">
+    <figcaption>Fig.1 Model compartmental flowchart</figcaption>
+</td>
+<td>
+  In this compartmental modelling framework, the population is subdivided into five 20-year age classes,
+  and for each age class <em>i</em>, that invariant sub-population is further broken down into 8 compartments:
+  <ul>
+    <li>Susceptible</li>
+    <li>Exposed (you have the disease but can't transmit it)</li>
+    <li>Infectious-subclinical (you can spread the disease but do not manifest symptoms)</li>
+    <li>Infectious-clinical (you have the disease and show symptoms)</li>
+    <li>Hospital inpatient (<em>H<sub>1</sub></em>)</li>
+    <li>ICU patient (<em>H<sub>2</sub></sub></em>)</li>
+    <li>Recovered</li>
+    <li>Deceased</li>
+  </ul>
+  The flowchart for an individual between the different compartments is shown in Figure 1.
+    The probabilities of an infected individual progressing to each of the more
+    serious states (symptomatic, hospitalised, in the ICU, and deceased) are age-dependent, while
+    the time spent in each compartment (i.e. the rate at which members exit that compartment) are
+    uniform across ages. <br><br>
+    Describing the rates at which each of these compartments change leaves you with a system of 40 coupled ODEs
+    that we can solve numerically (just using the Euler method, or RK4) in MATLAB.
+</td>
+</table>
+<p>The main problem with this kind of system is that you can end up with a very large number of parameters.
+We tried to fix as many aspects as possible, which became easier as 2021 progressed and more and more
+reliable meta-reviews of clinical studies were published, and ultimately the parameter(s)
+that will need to be learned by simulation relate to the transmission rate.
+This is not something that can be as easily observed in clinical settings, compared to
+the length of the symptomatic period for example, and it can change dependent on the viral variant, the age of
+the individual, whether or not they have symptoms, whether or not the self-isolate, whether they are indoors or outdoors,
+ how many people they share a household with, mask use, the degree of social distancing etc.
+Many of these factors changed significantly over the course of the pandemic according to national and local
+government policy - primarily lockdowns, school closures, and working from home. So a set of parameters will need to be determined
+to represent this and it will need to change in time, and possibly for different age groups or sections of society.
+To achieve this, we obtained relative weightings of the transmission between age-classes using an
+<a href="https://doi.org/10.1371/journal.pcbi.1005697">empirical data set</a>
+of contact matrices for different settings (home, workplace, school, and other) in the UK and Ireland,
+and condensed and combined them to match the age-structure here. Because
+this data lacked any estimates for contacts to and from those aged 80+, this had to be extrapolated from the behaviour
+of the 75-80's and scaled up to account for increased contact in care home settings - without this scaling the model
+severely under-predicted case numbers and hence hospitalisations and deaths in this crucial age group.
+<br>
+<br>
+The simulation period (January 2020 to March 2021) was divided into nine distinct time intervals based on key policy
+decision dates in the UK and specifically in Northern Ireland, and certain contacts were switched on or off during these
+intervals - so for example, the school contact matrix is switched off during lockdowns and school holidays. Roughly
+speaking then, the parameters to be learned are: the global transmission rate during each of the nine intervals, the
+day (in January) and age-class of the initial infection (for simplicity, we will assume there is only one kicking things off),
+the scaling of extra contacts for the over-80's, and finally the extent to which the work and other contact matrices are reduced in post-pandemic life.
+Testing a range of each of these, and fitting the predicted outputs to the 7-day rolling average of
+<a href="https://www.health-ni.gov.uk/articles/covid-19-daily-dashboard-updates">daily hospital admissions</a> in each age class,
+we end up with the following best fit simulation (Figure 2(a) shows the actual data from the Department of Health, and Figure 2(b) shows our simulation):
+</p/>
+<table cellspacing="80" class="center" width=85%>
+<td>
+    <img src="images/Research/Epidemiology/covid_ni_model_1500_empirical_new_RA_hosp_by_age.png" alt="covid northern ireland hospital" width="500">
+    <figcaption>Fig.2(a) Empirical rolling average of hospital admission by age</figcaption>
+</td>
+<td>
+  <img src="images/Research/Epidemiology/covid_ni_model_1500_FIT_proj_new_RA_hosp_by_age_1.png" alt="covid simulation hospital" width="500">
+  <figcaption>Fig.2(b) Best fit of model rolling average of hospital admission by age</figcaption>
+</td>
+</table>
+
+<p>Then looking at the resulting predictions of the total numbers in hospital, in ICU and cumulative mortality over the same period  (Figure 3(a) shows
+  the actual data, while Figure 3(b) shows the clinical outcomes predicted by our best-fit simulation):</p>
+<table cellspacing="80" class="center" width=85%>
+<td>
+    <img src="images/Research/Epidemiology/covid_ni_model_1500_empirical_in_hosp_ICU_deaths_total.png" alt="covid northern ireland occupancy deaths" width="500">
+    <figcaption>Fig.3(a) Empirical hospital and ICU occupancy and cumulative deaths</figcaption>
+</td>
+<td>
+  <img src="images/Research/Epidemiology/covid_ni_model_1500_proj_in_hosp_ICU_deaths_total_1.png" alt="covid simulation occupancy deaths" width="500">
+  <figcaption>Fig.3(b) Predicted hospital and ICU occupancy and cumulative deaths</figcaption>
+</td>
+</table>
+
+<p>Now, the general public has heard a lot about the <em>R<sub>0</sub></em> number (the basic reproduction number)
+of the virus, but as epidemiologists have highlighted in the literature, as this technically only applies at the very beginning
+of the outbreak where there is precisely one infectious individual in the population and you ask how many new infections will occur in the first
+generation after them, the actually relevant quantity to calculate is the <em>effective</em> reproductive number <em>R<sub>t</sub></em>.
+For an age-structured model, this can be achieved using the next-generation matrix method, and then we can ask questions about how
+<em>R<sub>t</sub></em> would have behaved, dependent on the number of immune or vaccinated people in the population at different points in
+the pandemic. Considering the average transmission rate in Spring 2020 (Figure 4(a)) and Autumn 2020 - Spring 2021 when lockdowns
+were not occuring (Figure 4(b)), we would require we would require 80.4% or 42% respectively of the population to be
+immune to lower the spread such that the reproduction number is less than one and the virus does not grow:
+</p>
+
+<table cellspacing="80" class="center" width=85%>
+<td>
+    <img src="images/Research/Epidemiology/r0_beta_susfrac_inverted.png" alt="covid northern ireland reproduction pre-pandemic" width="500">
+    <figcaption>Fig.4(a) Dependence of <em>R<sub>t</sub></em> on immune fraction of population in pre-pandemic conditions</figcaption>
+</td>
+<td>
+  <img src="images/Research/Epidemiology/r0_beta_susfrac_PP_inverted.png" alt="covid northern ireland reproduction post-lockdown" width="500">
+  <figcaption>Fig.4(b) Dependence of <em>R<sub>t</sub></em> on immune fraction of population in post-pandemic non-lockdown conditions</figcaption>
+</td>
+</table>
+
+<h3>Lockdown investigations</h3>
+<p>Now, all of the above has just been about trying to reproduce the behaviour of the virus in the Northern Irish population, and then make some
+simple inferences from that information. The useful applications then come from hypothetical questions that can be asked using this simulation
+as a baseline. One of the motivations of the original spatial network approach was that we would have been able to implement different rulesets
+for triggering local lockdowns. While this is no longer an option, we can consider triggering interventions according to some mechanistic rule
+based on an observable, recordable clinicial property such as the number of hospital occupants with the virus, or the number of daily deaths (in reality these
+could be estimated at the time simply by the excess of these values over the usual averages if the means of diagnosis are insufficiently rapid or reliable).
+<br>
+<br>The challenge with this kind of investigation is not coming up with interesting rules, or implementing them, it's that there is a very wide variety of
+permutations to the model and the severity, duration, and timing of the lockdowns that systematically accounting for all of the reasonable
+configurations will require a significant quantity of simulations and analysis, and so you try to eliminate as many redundant options as you can.
+Broadly speaking, it turns out to not matter too much if you use the hospital occupancy, ICU occupancy, or daily deaths as the quantity which triggers
+lockdowns so long as you adjust your scale accordingly. However, what <em>is</em> important is that so far we have treated Northern Ireland as as isolated system:
+there was one initial infection in January 2020, and from then on there was no input from the rest of the world. Now, that is fine as we assume that once COVID is in
+the country, then most transmission will occur within the community and further cases directly due to imports are negligible (it's entirely possible that this is
+actually not true, but it seems like a pretty reasonable assumption, which is a necessary evil in modelling of such imperfect systems of human behaviour).
+However, this can now become a problem if our hypothetical lockdowns are able to completely eradicate COVID within Northern Ireland, as in such a case
+(which is likely to be selected by our program as an optimal solution) the model is specifically behaving in an unrealistic fashion because of the lack
+of new cases arising from outside the country (or simply from the fact that real life is unlikely to be so perfectly controllable).
+<br>
+<br>
+Hence we will simulate the activation of lockdowns using the number of hospital occupants as the trigger,
+and we consider the following permutations of the model:
+<ul>
+  <li>Treating the country as a closed system as described, or with constant inflow where we add a single new case of random age class each day once the pandemic takes hold.</li>
+  <li>Three possible strengths (how much the transmission rate is reduced while lockdown is active) and durations of lockdown.</li>
+  <li>Either one or infinitely-many lockdowns are allowed within the first 1000 days once the pandemic begins.</li>
+  <li>A parameter space of how many hospital patients (0-2000) trigger the lockdown, and how many days (0-20) of delay there are until the lockdown actually starts.</li>
+</ul>
+</p>
+
+<table cellspacing="80" class="center" width=85%>
+<td>
+    <img src="images/Research/Epidemiology/dynamic_1_1_1_total_deaths.png" alt="covid northern ireland deaths constant" width="500">
+    <figcaption>Fig.5(a) Cumulative deaths with constant case inflow and one lockdown activated by hospital inpatients</figcaption>
+</td>
+<td>
+  <img src="images/Research/Epidemiology/dynamic_1_1_2_total_deaths.png" alt="covid northern ireland deaths closed" width="500">
+  <figcaption>Fig.5(b) Cumulative deaths in a closed system with one lockdown activated by hospital inpatients</figcaption>
+</td>
+</table>
+<p>
+  In Figure 5 above, we can see an overview of the total number of deaths over a 2000-day simulation from January 1st 2020 in systems where we only allow a single lockdown.
+  Figure 5(a) illustrates the scenario when there is a constant inflow of one new daily case, while Figure 5(b) is for the closed system.
+  <br><br>
+  As we can see from the differing scales, the constant inflow system does experience a greater number of deaths in all cases - both because the lockdown is
+  less effective at containing spread, and because herd immunity can never be truly achieved given that we continue to artificially add nearly 2000 additional cases
+  until the termination of the simulation. In this more realistic scenario (excluding, of course, the role of vaccination), the effectiveness of lockdowns is
+  quite straightforward - the stronger the better, noting that the weakest lockdown is so ineffective that it has essentially no positive impact. Unlike the closed system,
+  it is also clearer how ot time the lockdown to minimise deaths - given that we are restricted to one shot at an intervention, we want to leave it as long as possible
+  within the parameter space that was tested.
+<br><br>
+  For closed systems, eventually the population will achieve herd immunity and the virus will not be able to spread - so essentially the role of a single lockdown in these
+  scenarios is to time it such that the peak is cut off, and we achieve the minimal overflow over the threshold for herd immunity without unnecessary excess spread of the virus and hence additional deaths.
+  <br>
+  <br>
+  The optimal timing of lockdowns is a bit more interesting in a closed system, so let's examine what happens when we are allowed as many high-strength lockdowns as we require:
+  </p>
+
+  <table cellspacing="80" class="center" width=90%>
+  <td>
+      <img src="images/Research/Epidemiology/dynamic_2_1_2_total_deaths_High.png" alt="covid northern ireland deaths lockdown" width="400">
+      <figcaption>Fig.6(a) Cumulative deaths after 2000 days with multiple lockdowns occuring in days 30-1000</figcaption>
+  </td>
+  <td>
+    <img src="images/Research/Epidemiology/dynamic_2_1_2_total_deaths_2000_High.png" alt="covid northern ireland deaths lockdown 2000" width="400">
+    <figcaption>Fig.6(b) Cumulative deaths after 2000 days with multiple lockdowns occuring in days 30-2000</figcaption>
+  </td>
+  <td>
+    <img src="images/Research/Epidemiology/dynamic_2_1_2_peak_hosp_High.png" alt="covid northern ireland peak hospital" width="400">
+    <figcaption>Fig.6(c) Peak hospital occupancy after 2000 days with multiple lockdowns occuring in days 30-1000</figcaption>
+  </td>
+  </table>
+  In Figure 6 above, (a) is the cumulative deaths after 2000 days when the lockdowns are only permitted to occur between days 30-1000;
+  (b) is the cumulative deaths when lockdowns are permitted right up until simulation end (day 2000); and (c) is the peak hospital occupancy
+  when the lockdowns are once again only permitted between days 30-1000.
+  <br><br>
+  So there are a few interesting things to note here:
+  <ul>
+    <li>If we stop taking measurements immediately once lockdowns are no longer allowed, it seems as though using the lowest possible trigger is
+    the way to go. However, if we then wait 1000 days with no lockdowns we see that this is actually a very poor option - as once the restrictions are lifted then we are essentially
+  in the same position as we were at the beginning of the pandemic, and (unless you have been using those years to develop a vaccine) you will then experience very rapid spread and
+a large number of deaths.</li>
+  <li>With this in mind, the true optimum trigger for long-term deaths occurs in intermediate bands of the parameter space: either 900-1000 or 1400-1600
+  inpatients, assuming it takes 5-10 days to register this and then put the lockdown measures in place.</li>
+  <li>However, this is a higher trigger than if your objective is to control the peak demands on the hospital ward, in which case you would use a trigger of around 400-800 inpatients.</li>
+  </ul>
+  <p>
+
+  </p>
+
+
+  <div class="footer-section">
+    <hr />
+    <h3>
+      <a class="footer-anchor" href="index.html">Homepage</a>
+      <a class="footer-anchor" href="research.html">Current research</a>
+      <a class="footer-anchor" href="cv.html">CV</a>
+      <a class="footer-anchor" href="publications.html">Publications</a>
+      <a class="footer-anchor" href="interests.html">Interests</a>
+    </h3>
+  </div>
+
+</body>
+
 </html>

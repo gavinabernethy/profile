@@ -2,26 +2,40 @@
 /**************************** TAG SELECTORS ****************************/
 
 body {
-  background-color: #F4F3F3;
-  max-width: 80%;
+  background-color: #242330;
+  max-width: 85%;
   margin: auto;
-  font-family: "Verdana";
+  font-family: "Verdana", sans-serif;
+  line-height: 1.4;
+  color: #fafaf7;
 }
 
 h1 {
   text-align: center;
-  color: #494949;
-  font-family: "Geneva";
+  color: #f2b611;
+  font-family: "Jost", "Lora", "Geneva", sans-serif;
+  margin: 50px auto 20px auto;
+  font-size: 2.5em;
+  font-weight: 300;
+}
+
+h2 {
+  color: #f2b611;
 }
 
 h3 {
   text-align: center;
-  color: #494949;
+  color: #f2b611;
   font-family: "Geneva";
 }
 
+.section-lead {
+  margin-bottom: 1.5em;
+}
+
 h4 {
-  color: #494949;
+  margin-top: 50px;
+  color: #f2b611;
   font-family: "Geneva";
 }
 
@@ -34,9 +48,68 @@ hr {
   margin-bottom: 80px;
 }
 
+p {
+  color: #fafaf7;
+}
+
+li {
+ color: #fafaf7;
+ margin: 10px auto;
+}
+
+figcaption {
+  text-align: center;
+  width: 78%;
+}
+
+table {
+ color: #fafaf7;
+ -webkit-border-horizontal-spacing: 0;
+ -webkit-border-vertical-spacing: 0;
+ border-spacing: 15px;
+}
+
+.profile-td {
+  padding: 0 50px;
+}
+
+a {
+  text-decoration: none;
+  color: #f2b611;
+}
+
+a:hover {
+  color: #fc79c6;
+}
+
+.footer-anchor {
+  margin: 10px 20px 100px 20px;
+  display: inline-block;
+}
+
+.side-anchor {
+  margin: 5px 0;
+  display: inline-block;
+}
+
+.single-section {
+  margin: 100px auto;
+  width: 58%;
+}
+
+.right-section {
+  position: fixed;
+  top: 100px;
+}
+
+.header-space {
+  margin: 100px auto 0px;
+}
+
 /**************************** CLASS SELECTORS ****************************/
 
 .center {
   margin-left: auto;
   margin-right: auto;
+  display: block;
 }

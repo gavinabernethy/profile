@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Ideological dynamics in social networks</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="images/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400&family=Lora&display=swap" rel="stylesheet">
+  </head>
+  <body>
+
+    <h1>Evolving ideological dynamics in social networks</h1>
+
+    <p>
+    This is an upcoming research project that I have recently started work on, and
+    which will be the sole subject of a research visit to the Ulster University funded
+    by the London Mathematical Society. The main objective is to extend some of the work previously conducted by
+    Dr Mark McCartney and Dr David Glass on ideological dynamics, by introducing
+    a capacity for the beliefs themselves to mutate and be subject to evolutionary
+    pressures in the social sphere.
+    <br>
+    <br>
+    Originally, this might have involved couple ODEs and logistic growth models for
+    coupled social groups, but first I want to explore an idea that may be more suitable
+    as an extension of existing opinion dynamics models for agents. Essentially, this would
+    be somewhat similar to a kind of gravity model with many bodies in the belief space,
+    but with the possibility that a belief could be highly-attracting if the agent is sufficiently
+    close to it, but repulsive if the agent is far enough away. This could be acheived in its
+    simplest form by assigning two features to a belief:
+      <ul>
+        <li>A value in the two-dimensional belief space (agents will also have one of these to represent their current view).</li>
+        <li>An appeal function, that controls how steeply this attractiveness-repulsiveness changes with distance in the belief space.</li>
+      </ul>
+      This would allow a belief to be defined by both its principles/ideological position, and a measure of its radical nature or broad appeal.
+      At each timestep, all agents will move in accordance with the net gravitational pull that they feel from all of the beliefs, according to their
+      proximity and appeal functions. The beliefs themselves may also experience change. Exactly how to implement this is not yet clear, but I think
+      it ought to exhibit the following behaviours:
+      <ul>
+        <li>When overall adherence is low, the appeal function tends towards less radical to broaden appeal.</li>
+        <li>When overall adherence is large, the belief should move in the direction of the net belief of all adherents (medium or close),
+          with a speed weighted by the ratio of moderate to close believers - as the devout believers have more inertia and resist changing the belief.</li>
+      </ul>
+      This design features should then result in the following outcomes, which seem reasonable and likely to be produce interesting dynamics:
+      <ul>
+        <li>When there are a few devout believers, the belief remains close, but broadens appeal.</li>
+        <li>When there are many devout believers, the belief does not change and does not broaden appeal - possibly becoming more extreme and insular.</li>
+        <li>When there are many weak believers, they rapidly update the belief.</li>
+        <li>When there are few weak believers, the belief drifts and broadens until a revolutionary or political radical (e.g. a philosopher) picks it up, defines it, and starts to attract others.</li>
+        <li>A belief is not influenced directly by the existence and position of competing beliefs, but just by the sociological influences that follow as a result.</li>
+      </ul>
+    Applications of this model will then include opposing media influencers, who would be represented by a small number of agents with strong inertia close to a belief, and with very strong weighting in the
+    "mass appeal" function of how attractive a belief appears to be. This will form part of an upcoming AI-based PhD project being advertised at Sheffield Hallam University on "Misinformation in social networks."
+    Given the focus of this model design on the position of the belief in the belief space and its propensity for change and become more or less radical, this particular model may also be particularly suited to
+    longer-term questions of doctrinal position and belief convergence or divergence, so it may be suitable for looking at the social evolution of political parties an dsplinter groups,
+    or at the formation of church denominations.
+    </p>
+
+    <div class="footer-section">
+      <hr />
+      <h3>
+        <a class="footer-anchor" href="index.html">Homepage</a>
+        <a class="footer-anchor" href="research.html">Current research</a>
+        <a class="footer-anchor" href="cv.html">CV</a>
+        <a class="footer-anchor" href="publications.html">Publications</a>
+        <a class="footer-anchor" href="interests.html">Interests</a>
+      </h3>
+    </div>
+  </body>
+</html>
